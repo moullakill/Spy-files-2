@@ -65,15 +65,15 @@
 
     .gallery img {
       width: 100%;
-      height: 250px; /* Hauteur fixe pour un aspect plus uniforme */
+      height: 250px;
       object-fit: cover;
       border-radius: 15px;
       box-shadow: 0 8px 25px var(--shadow-dark);
       transition: transform 0.4s ease, box-shadow 0.4s ease, opacity 0.5s ease;
       cursor: pointer;
       border: 3px solid transparent;
-      opacity: 0; /* Pour l'animation de fade-in */
-      animation: fadeIn 1s forwards; /* Appliqué par JS pour chaque image */
+      opacity: 0;
+      animation: fadeIn 1s forwards;
     }
 
     .gallery img:hover {
@@ -102,7 +102,78 @@
 
     .error-message {
       color: #ff6b6b;
-      animation: none; /* Pas de pulsation pour les erreurs */
+      animation: none;
+    }
+
+    /* Lightbox Styles */
+    .lightbox {
+      display: none; /* Hidden by default */
+      position: fixed; /* Stay in place */
+      z-index: 2000; /* Sit on top */
+      left: 0;
+      top: 0;
+      width: 100%; /* Full width */
+      height: 100%; /* Full height */
+      overflow: auto; /* Enable scroll if needed */
+      background-color: rgba(0,0,0,0.9); /* Black w/ opacity */
+      backdrop-filter: blur(8px); /* Subtle blur effect */
+      -webkit-backdrop-filter: blur(8px); /* Safari support */
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out;
+    }
+
+    .lightbox.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .lightbox-content {
+      position: relative;
+      margin: auto;
+      padding: 0;
+      max-width: 90%;
+      max-height: 90%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      animation: zoomIn 0.3s ease-out;
+    }
+
+    .lightbox-content img {
+      width: auto;
+      height: auto;
+      max-width: 100%;
+      max-height: 100%;
+      display: block;
+      object-fit: contain; /* Ensure the whole image is visible */
+      border-radius: 10px;
+      box-shadow: 0 0 40px rgba(0,0,0,0.9);
+      transition: transform 0.2s ease;
+    }
+
+    .lightbox-content img:hover {
+        transform: scale(1.01); /* Slight zoom on hover for the full-screen image */
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 35px;
+      color: #f1f1f1;
+      font-size: 40px;
+      font-weight: bold;
+      transition: 0.3s;
+      cursor: pointer;
+      z-index: 2001; /* Above the image */
+    }
+
+    .close-btn:hover,
+    .close-btn:focus {
+      color: #bbb;
+      text-decoration: none;
+      cursor: pointer;
     }
 
     /* Animations */
@@ -114,6 +185,11 @@
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
+    }
+
+    @keyframes zoomIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
     }
 
     @keyframes pulse {
@@ -129,6 +205,11 @@
       .gallery img {
         height: 200px;
       }
+      .close-btn {
+        top: 10px;
+        right: 20px;
+        font-size: 30px;
+      }
     }
 
     @media (max-width: 480px) {
@@ -139,10 +220,15 @@
         padding: 20px 10px;
       }
       .gallery {
-        grid-template-columns: 1fr; /* Une seule colonne sur très petits écrans */
+        grid-template-columns: 1fr;
       }
       .gallery img {
         height: 180px;
+      }
+      .close-btn {
+        top: 5px;
+        right: 10px;
+        font-size: 25px;
       }
     }
   </style>
@@ -162,11 +248,18 @@
     &copy; 2025 &mdash; Ma Super Galerie Photo. Tous droits réservés.
   </footer>
 
+  <div id="myLightbox" class="lightbox">
+    <span class="close-btn">&times;</span>
+    <div class="lightbox-content">
+      <img id="lightboxImg" src="" alt="Image en plein écran">
+    </div>
+  </div>
+
   <script>
     async function loadGallery() {
       const gallery = document.getElementById('gallery');
       const loadingMsg = document.getElementById('loading-msg');
-      loadingMsg.style.display = 'block'; // Affiche le message de chargement
+      loadingMsg.style.display = 'block';
 
       try {
         const response = await fetch('UTL.html');
@@ -185,15 +278,16 @@
           return;
         }
 
-        gallery.innerHTML = ''; // Nettoie le message de chargement
+        gallery.innerHTML = '';
         urls.forEach((url, index) => {
           const img = document.createElement('img');
           img.src = url;
           img.alt = `Image de la galerie ${index + 1}`;
-          img.loading = 'lazy'; // Optimisation pour le chargement des images
+          img.loading = 'lazy';
+          img.style.animationDelay = `${index * 0.1}s`;
           
-          // Applique l'animation de fade-in avec un délai pour un effet "staggered"
-          img.style.animationDelay = `${index * 0.1}s`; 
+          // Add click listener to open lightbox
+          img.addEventListener('click', () => openLightbox(url));
           
           gallery.appendChild(img);
         });
@@ -202,9 +296,38 @@
         console.error("Erreur lors du chargement de la galerie :", e);
         gallery.innerHTML = `<p class="error-message">Oups ! Une erreur est survenue lors du chargement des images.<br>Détail : ${e.message}</p>`;
       } finally {
-        loadingMsg.style.display = 'none'; // Cache le message de chargement
+        loadingMsg.style.display = 'none';
       }
     }
+
+    // Lightbox functions
+    const lightbox = document.getElementById('myLightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const closeBtn = document.getElementsByClassName('close-btn')[0];
+
+    function openLightbox(imageUrl) {
+      lightbox.classList.add('active'); // Add 'active' class to show with transition
+      lightboxImg.src = imageUrl;
+    }
+
+    // Close the lightbox when clicking the close button
+    closeBtn.addEventListener('click', () => {
+      lightbox.classList.remove('active');
+    });
+
+    // Close the lightbox when clicking outside the image (on the overlay)
+    lightbox.addEventListener('click', (event) => {
+      if (event.target === lightbox) {
+        lightbox.classList.remove('active');
+      }
+    });
+
+    // Close with Escape key
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && lightbox.classList.contains('active')) {
+        lightbox.classList.remove('active');
+      }
+    });
 
     document.addEventListener('DOMContentLoaded', loadGallery);
   </script>
