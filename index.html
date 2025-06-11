@@ -3,126 +3,210 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Galerie d'images</title>
+  <title>Ma Super Galerie d'Images</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Open+Sans:wght@300;400&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --bg-dark: #1a1a2e;
+      --bg-medium: #16213e;
+      --text-light: #e0e0e0;
+      --accent-purple: #6a11cb;
+      --accent-blue: #2575fc;
+      --shadow-light: rgba(0, 0, 0, 0.3);
+      --shadow-dark: rgba(0, 0, 0, 0.6);
+    }
+
     body {
-      margin: 0; 
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #121212;
-      color: #fff;
+      margin: 0;
+      font-family: 'Open Sans', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-light);
       display: flex;
       flex-direction: column;
       min-height: 100vh;
+      line-height: 1.6;
     }
 
     header {
-      padding: 1.5rem;
-      background: linear-gradient(90deg, #6a11cb, #2575fc);
+      padding: 2rem;
+      background: linear-gradient(90deg, var(--accent-purple), var(--accent-blue));
       text-align: center;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+      box-shadow: 0 5px 15px var(--shadow-dark);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      animation: fadeInDown 0.8s ease-out;
     }
 
     header h1 {
       margin: 0;
-      font-weight: 900;
-      font-size: 2rem;
-      letter-spacing: 0.05em;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 2.8rem;
+      letter-spacing: 0.08em;
+      text-shadow: 2px 2px 4px var(--shadow-dark);
     }
 
     main {
       flex-grow: 1;
-      padding: 20px;
-      max-width: 1200px;
+      padding: 30px 20px;
+      max-width: 1300px;
       margin: 0 auto;
+      width: 100%;
+      box-sizing: border-box;
     }
 
     .gallery {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 15px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+      padding: 20px 0;
     }
 
     .gallery img {
       width: 100%;
-      height: 100%;
+      height: 250px; /* Hauteur fixe pour un aspect plus uniforme */
       object-fit: cover;
-      border-radius: 12px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border-radius: 15px;
+      box-shadow: 0 8px 25px var(--shadow-dark);
+      transition: transform 0.4s ease, box-shadow 0.4s ease, opacity 0.5s ease;
       cursor: pointer;
+      border: 3px solid transparent;
+      opacity: 0; /* Pour l'animation de fade-in */
+      animation: fadeIn 1s forwards; /* Appliqué par JS pour chaque image */
     }
 
     .gallery img:hover {
-      transform: scale(1.05);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+      transform: translateY(-8px) scale(1.03);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.9);
+      border-color: var(--accent-blue);
     }
 
     footer {
       text-align: center;
-      padding: 1rem;
-      font-size: 0.9rem;
-      color: #aaa;
-      background: #1e1e1e;
+      padding: 1.5rem;
+      font-size: 0.85rem;
+      color: #999;
+      background: var(--bg-medium);
+      border-top: 1px solid #2a2a40;
+      margin-top: 30px;
     }
 
-    /* Responsive tweaks */
-    @media (max-width: 600px) {
+    .loading-message, .error-message {
+      text-align: center;
+      padding: 50px;
+      font-size: 1.2rem;
+      color: #aaa;
+      animation: pulse 1.5s infinite alternate;
+    }
+
+    .error-message {
+      color: #ff6b6b;
+      animation: none; /* Pas de pulsation pour les erreurs */
+    }
+
+    /* Animations */
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-50px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes pulse {
+      from { transform: scale(1); opacity: 0.7; }
+      to { transform: scale(1.05); opacity: 1; }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
       header h1 {
-        font-size: 1.5rem;
+        font-size: 2rem;
+      }
+      .gallery img {
+        height: 200px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      header h1 {
+        font-size: 1.8rem;
       }
       main {
-        padding: 10px;
+        padding: 20px 10px;
+      }
+      .gallery {
+        grid-template-columns: 1fr; /* Une seule colonne sur très petits écrans */
+      }
+      .gallery img {
+        height: 180px;
       }
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>Galerie d'images</h1>
+    <h1>Ma Super Galerie d'Images</h1>
   </header>
 
   <main>
     <div class="gallery" id="gallery">
-      <!-- Images injectées ici -->
-    </div>
+      <p class="loading-message" id="loading-msg">Chargement des images en cours...</p>
+      </div>
   </main>
 
   <footer>
-    © 2025 — Ta galerie photo
+    &copy; 2025 &mdash; Ma Super Galerie Photo. Tous droits réservés.
   </footer>
 
   <script>
-    // Charge UTL.html, qui doit contenir uniquement des URLs d'images (une par ligne)
     async function loadGallery() {
+      const gallery = document.getElementById('gallery');
+      const loadingMsg = document.getElementById('loading-msg');
+      loadingMsg.style.display = 'block'; // Affiche le message de chargement
+
       try {
         const response = await fetch('UTL.html');
-        if (!response.ok) throw new Error('Impossible de charger UTL.html');
+        if (!response.ok) {
+          throw new Error(`Erreur HTTP: ${response.status} - Impossible de charger UTL.html`);
+        }
         const text = await response.text();
 
-        // Supposons que UTL.html contient juste une liste d'URLs séparées par lignes
-        // Si UTL.html est un fichier HTML, on peut aussi parser pour extraire les images
         const urls = text
           .split('\n')
           .map(line => line.trim())
-          .filter(line => line && (line.endsWith('.jpg') || line.endsWith('.jpeg') || line.endsWith('.png') || line.endsWith('.webp')));
+          .filter(line => line && (line.endsWith('.jpg') || line.endsWith('.jpeg') || line.endsWith('.png') || line.endsWith('.webp') || line.endsWith('.gif')));
         
-        const gallery = document.getElementById('gallery');
-        urls.forEach(url => {
+        if (urls.length === 0) {
+          gallery.innerHTML = '<p class="error-message">Aucune image trouvée ou URLs invalides dans UTL.html.</p>';
+          return;
+        }
+
+        gallery.innerHTML = ''; // Nettoie le message de chargement
+        urls.forEach((url, index) => {
           const img = document.createElement('img');
           img.src = url;
-          img.alt = "Image galerie";
-          img.loading = 'lazy';
+          img.alt = `Image de la galerie ${index + 1}`;
+          img.loading = 'lazy'; // Optimisation pour le chargement des images
+          
+          // Applique l'animation de fade-in avec un délai pour un effet "staggered"
+          img.style.animationDelay = `${index * 0.1}s`; 
+          
           gallery.appendChild(img);
         });
 
       } catch (e) {
-        console.error(e);
-        document.getElementById('gallery').innerText = 'Erreur lors du chargement des images.';
+        console.error("Erreur lors du chargement de la galerie :", e);
+        gallery.innerHTML = `<p class="error-message">Oups ! Une erreur est survenue lors du chargement des images.<br>Détail : ${e.message}</p>`;
+      } finally {
+        loadingMsg.style.display = 'none'; // Cache le message de chargement
       }
     }
 
-    loadGallery();
+    document.addEventListener('DOMContentLoaded', loadGallery);
   </script>
 </body>
 </html>
-
