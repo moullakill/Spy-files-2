@@ -3,67 +3,60 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>AmourMosaïque</title>
+  <title>XXXHeatMosaic</title>
   <link
     href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Open+Sans:wght@300;400&display=swap"
     rel="stylesheet"
   >
   <style>
     :root {
-      --bg-love-start: #ff9a9e;
-      --bg-love-end:   #fad0c4;
-      --accent-dark:   #ff6f91;
-      --accent-light:  #ffb3c1;
-      --text-dark:     #333;
-      --shadow:        rgba(0,0,0,0.2);
-      --row-height:    8; /* pour le calcul du masonry */
+      --bg-start: #ff0057;       /* hot pink */
+      --bg-end:   #d500f9;       /* purple néon */
+      --accent:   #ff6d00;       /* orange brûlant */
+      --text:     #fff;
+      --shadow:   rgba(0,0,0,0.2);
     }
-    *,
-    *::before,*::after { box-sizing: border-box; }
-
+    *, *::before, *::after { box-sizing: border-box; }
     body {
       margin: 0;
-      font-family: 'Open Sans', sans-serif;
-      background: linear-gradient(135deg, var(--bg-love-start), var(--bg-love-end));
-      color: var(--text-dark);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      font-family: 'Open Sans', sans-serif;
+      background: linear-gradient(135deg, var(--bg-start), var(--bg-end));
+      color: var(--text);
     }
     header {
+      padding: 1.5rem;
       text-align: center;
-      padding: 2rem 1rem;
-      background: var(--accent-dark);
-      color: #fff;
+      background: var(--accent);
       box-shadow: 0 4px 12px var(--shadow);
     }
     header h1 {
       margin: 0;
       font-family: 'Montserrat', sans-serif;
       font-size: 2.5rem;
+      letter-spacing: .05em;
     }
     .controls {
       display: flex;
-      gap: 1rem;
-      justify-content: center;
       flex-wrap: wrap;
-      padding: 1rem;
+      justify-content: center;
+      gap: 1rem;
+      padding: .75rem;
     }
     .controls select,
-    .controls input[type="checkbox"] {
+    .controls input {
       padding: .5rem;
-      border: 2px solid var(--accent-dark);
+      border: 2px solid var(--accent);
       border-radius: 4px;
       background: #fff;
-      color: var(--text-dark);
+      color: #333;
+      font-size: .9rem;
       cursor: pointer;
     }
-    .controls label {
-      display: flex;
-      align-items: center;
-      gap: .3rem;
-      font-size: .9rem;
-    }
+    .controls label { display: flex; align-items: center; gap:.3rem; font-size:.9rem; color:#fff; }
+
     main {
       flex: 1;
       max-width: 1200px;
@@ -71,80 +64,72 @@
       padding: 1rem;
     }
 
-    /* Masonry avec CSS Grid + JS */
+    /* Masonry columns : fluid, sans trous */
     .gallery {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px,1fr));
-      grid-auto-rows: var(--row-height)rem;
-      grid-gap: 1rem;
+      column-width: 260px;       /* largeur de colonne mini */
+      column-gap: 1rem;
     }
     .gallery figure {
-      margin: 0;
-      position: relative;
-      overflow: hidden;
+      display: inline-block;     /* pour le flux multi-colonnes */
+      width: 100%;
+      margin: 0 0 1rem;
       border-radius: 8px;
-      box-shadow: 0 4px 10px var(--shadow);
-      background: #fff;
-      transition: transform .3s;
+      overflow: hidden;
+      box-shadow: 0 5px 15px var(--shadow);
+      background: #111;
+      transition: transform .3s, box-shadow .3s;
       cursor: pointer;
     }
     .gallery figure:hover {
-      transform: translateY(-5px);
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 8px 25px var(--shadow);
     }
     .gallery img {
-      width: 100%;
-      height: auto;
       display: block;
+      width: 100%;
+      height: auto;             /* on garde les proportions */
     }
     .gallery figcaption {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      background: rgba(255,255,255,0.7);
-      color: var(--accent-dark);
-      padding: .3rem;
-      font-size: .85rem;
-      text-align: center;
       display: none;
+      padding: .4rem;
+      background: rgba(0,0,0,0.6);
+      color: var(--accent);
+      text-align: center;
+      font-size: .85rem;
     }
     .gallery.show-captions figcaption {
       display: block;
     }
 
-    /* Lightbox */
+    /* Lightbox simplissime */
     .lightbox {
-      position: fixed;
-      inset: 0;
+      position: fixed; inset:0;
       display: none;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0,0,0,.8);
-      z-index: 10;
+      align-items: center; justify-content: center;
+      background: rgba(0,0,0,.85);
+      z-index: 50;
     }
     .lightbox.active { display: flex; }
     .lightbox img {
-      max-width: 90%;
-      max-height: 90%;
+      max-width: 90%; max-height: 90%;
       border-radius: 6px;
-      box-shadow: 0 0 20px var(--shadow);
+      box-shadow: 0 0 30px var(--shadow);
     }
     .lightbox .close {
       position: absolute;
       top: 1rem; right: 1rem;
-      font-size: 2rem;
-      color: #fff;
-      background: none;
-      border: none;
+      font-size: 2rem; color: var(--text);
+      background: none; border: none;
       cursor: pointer;
     }
 
-    /* Status & erreurs */
     .status {
       text-align: center;
+      color: var(--accent);
       padding: 2rem;
       font-size: 1.2rem;
-      color: var(--accent-dark);
     }
-    @media (max-width:600px){
+    @media (max-width: 600px) {
       header h1 { font-size: 1.8rem; }
       .controls { flex-direction: column; }
     }
@@ -153,14 +138,14 @@
 <body>
 
   <header>
-    <h1>AmourMosaïque</h1>
+    <h1>XXXHeatMosaic</h1>
   </header>
 
   <div class="controls">
     <label>
       Trier par
       <select id="sort">
-        <option value="default">Par défaut</option>
+        <option value="default">Original</option>
         <option value="name">Nom ↑</option>
         <option value="nameDesc">Nom ↓</option>
         <option value="random">Aléatoire</option>
@@ -168,112 +153,82 @@
     </label>
     <label>
       <input type="checkbox" id="toggle-captions">
-      Afficher légendes
+      Légendes
     </label>
   </div>
 
   <main>
     <div id="gallery" class="gallery"></div>
-    <p id="status" class="status">Chargement…</p>
+    <p id="status" class="status">Chargement en cours…</p>
   </main>
 
   <div id="lightbox" class="lightbox" aria-hidden="true">
     <button class="close" aria-label="Fermer">×</button>
-    <img src="" alt="Image agrandie">
+    <img src="" alt="">
   </div>
 
   <script>
   (function(){
     const SUPPORTED = /\.(jpe?g|png|webp|gif)$/i;
-    const galleryEl = document.getElementById('gallery');
-    const statusEl  = document.getElementById('status');
-    const sortEl    = document.getElementById('sort');
-    const capEl     = document.getElementById('toggle-captions');
-    const lightbox  = document.getElementById('lightbox');
-    const lbImg     = lightbox.querySelector('img');
-    const btnClose  = lightbox.querySelector('.close');
+    const G = document.getElementById('gallery');
+    const S = document.getElementById('status');
+    const sortEl = document.getElementById('sort');
+    const capEl  = document.getElementById('toggle-captions');
+    const LB     = document.getElementById('lightbox');
+    const lbImg  = LB.querySelector('img');
+    const btnC   = LB.querySelector('.close');
+    let items = [], urls = [];
 
-    let urls = [], items = [];
-
-    // calcul du masonry: on ajuste grid-row-end selon la hauteur naturelle
-    function adjustSpans(fig){
-      const rowH = parseFloat(getComputedStyle(galleryEl).getPropertyValue('grid-auto-rows'));
-      const gap  = parseFloat(getComputedStyle(galleryEl).getPropertyValue('grid-gap'));
-      const img  = fig.querySelector('img');
-      const h    = img.naturalHeight * fig.clientWidth / img.naturalWidth;
-      const span = Math.ceil((h + gap) / (rowH * 16 + gap));
-      fig.style.gridRowEnd = `span ${span}`;
-    }
-
-    async function loadGallery(){
-      try {
-        const res   = await fetch('UTL.html');
-        if(!res.ok) throw new Error(res.statusText);
-        const text  = await res.text();
-        urls       = text.split('\n')
-                         .map(s => s.trim())
-                         .filter(s => SUPPORTED.test(s));
-        if(!urls.length) throw new Error('Aucune URL valide.');
-
-        buildItems();
-      }
-      catch(err){
-        statusEl.textContent = 'Erreur : ' + err.message;
-      }
-    }
-
-    function buildItems(){
-      galleryEl.innerHTML = '';
-      statusEl.style.display = 'none';
-      items = urls.map((url,i)=>({url, name: url.split('/').pop(), idx: i}));
-      applySort();
-      items.forEach((it,i) => {
+    function build(){
+      G.innerHTML = ''; S.style.display='none';
+      items.forEach((it,i)=>{
         const fig = document.createElement('figure');
-        const img = document.createElement('img');
-        const cap = document.createElement('figcaption');
         fig.dataset.idx = i;
-        img.src       = it.url;
-        img.alt       = it.name;
-        cap.textContent = it.name;
-        fig.append(img, cap);
-        galleryEl.append(fig);
-        img.onload = ()=> adjustSpans(fig);
-        fig.addEventListener('click', ()=> openLb(it.url, it.name));
+        fig.innerHTML = `
+          <img src="${it.url}" alt="${it.name}">
+          <figcaption>${it.name}</figcaption>
+        `;
+        G.append(fig);
       });
     }
 
-    function applySort(){
+    function sortItems(){
       const v = sortEl.value;
-      if(v === 'name')     items.sort((a,b)=> a.name.localeCompare(b.name));
-      else if(v === 'nameDesc') items.sort((a,b)=> b.name.localeCompare(a.name));
-      else if(v === 'random')   items.sort(()=> Math.random()-0.5);
-      // default: on respecte l’ordre d’urls
+      if(v==='name')      items.sort((a,b)=>a.name.localeCompare(b.name));
+      else if(v==='nameDesc') items.sort((a,b)=>b.name.localeCompare(a.name));
+      else if(v==='random')   items.sort(()=>Math.random()-0.5);
+      // default: origine
     }
 
-    function openLb(url, name){
-      lbImg.src   = url;
-      lbImg.alt   = name;
-      lightbox.setAttribute('aria-hidden','false');
-      lightbox.classList.add('active');
-    }
-    function closeLb(){
-      lightbox.classList.remove('active');
-      lightbox.setAttribute('aria-hidden','true');
+    async function load(){
+      try {
+        const res = await fetch('UTL.html');
+        if(!res.ok) throw new Error(res.status);
+        const lines = (await res.text()).split('\n');
+        urls = lines.map(l=>l.trim()).filter(l=>SUPPORTED.test(l));
+        if(!urls.length) throw new Error('Aucune URL valide');
+        items = urls.map(u=>({url:u,name:u.split('/').pop()}));
+        sortItems(); build();
+      }
+      catch(e){
+        S.textContent = 'Erreur : '+e.message;
+      }
     }
 
-    sortEl.addEventListener('change', ()=> buildItems());
-    capEl .addEventListener('change', ()=> {
-      galleryEl.classList.toggle('show-captions', capEl.checked);
+    G.addEventListener('click', e=>{
+      const fig = e.target.closest('figure');
+      if(!fig) return;
+      const it = items[+fig.dataset.idx];
+      lbImg.src = it.url; lbImg.alt = it.name;
+      LB.setAttribute('aria-hidden','false'); LB.classList.add('active');
     });
-    btnClose.addEventListener('click', closeLb);
-    lightbox.addEventListener('click', e=> {
-      if(e.target===lightbox) closeLb();
-    });
-    document.addEventListener('keydown', e=>{
-      if(e.key==='Escape') closeLb();
-    });
+    btnC.onclick = ()=>{ LB.classList.remove('active'); LB.setAttribute('aria-hidden','true'); };
+    LB.addEventListener('click', e=>{ if(e.target===LB) btnC.click(); });
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape') btnC.click(); });
+    sortEl.addEventListener('change', ()=>{ sortItems(); build(); });
+    capEl .addEventListener('change', ()=>{ G.classList.toggle('show-captions', capEl.checked); });
 
-    document.addEventListener('DOMContentLoaded', loadGallery);
+    document.addEventListener('DOMContentLoaded', load);
   })();
   </script>
 </body>
