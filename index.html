@@ -1,142 +1,182 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>XXXHeatMosaic</title>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Open+Sans:wght@300;400&display=swap"
-    rel="stylesheet"
-  >
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&family=Open+Sans:wght@300;400&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-start: #ff0057;       /* hot pink */
-      --bg-end:   #d500f9;       /* purple néon */
-      --accent:   #ff6d00;       /* orange brûlant */
-      --text:     #fff;
-      --shadow:   rgba(0,0,0,0.2);
+      --bg-start: #ff0057;
+      --bg-end: #d500f9;
+      --accent: #ff6d00;
+      --text: #fff;
+      --shadow: rgba(0, 0, 0, 0.3);
+      --bg-dark: #1a1a1a;
     }
-    *, *::before, *::after { box-sizing: border-box; }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
       font-family: 'Open Sans', sans-serif;
       background: linear-gradient(135deg, var(--bg-start), var(--bg-end));
       color: var(--text);
+      display: flex;
+      flex-direction: column;
     }
+
     header {
-      padding: 1.5rem;
-      text-align: center;
       background: var(--accent);
+      padding: 2rem 1rem;
+      text-align: center;
       box-shadow: 0 4px 12px var(--shadow);
     }
+
     header h1 {
       margin: 0;
       font-family: 'Montserrat', sans-serif;
-      font-size: 2.5rem;
-      letter-spacing: .05em;
+      font-size: 2.8rem;
+      letter-spacing: 0.05em;
     }
+
     .controls {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       gap: 1rem;
-      padding: .75rem;
+      padding: 1rem;
+      background-color: rgba(0,0,0,0.15);
+      backdrop-filter: blur(4px);
     }
+
+    .controls label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1rem;
+      color: #fff;
+    }
+
     .controls select,
-    .controls input {
-      padding: .5rem;
-      border: 2px solid var(--accent);
-      border-radius: 4px;
-      background: #fff;
+    .controls input[type="checkbox"] {
+      padding: 0.5rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      background-color: #fff;
       color: #333;
-      font-size: .9rem;
+      box-shadow: 0 2px 6px var(--shadow);
       cursor: pointer;
+      transition: box-shadow 0.2s ease;
     }
-    .controls label { display: flex; align-items: center; gap:.3rem; font-size:.9rem; color:#fff; }
+
+    .controls select:hover {
+      box-shadow: 0 3px 8px var(--shadow);
+    }
 
     main {
       flex: 1;
-      max-width: 1200px;
+      max-width: 1400px;
       margin: 0 auto;
-      padding: 1rem;
+      padding: 2rem 1rem;
     }
 
-    /* Masonry columns : fluid, sans trous */
     .gallery {
-      column-width: 260px;       /* largeur de colonne mini */
-      column-gap: 1rem;
+      column-width: 260px;
+      column-gap: 1.2rem;
     }
+
     .gallery figure {
-      display: inline-block;     /* pour le flux multi-colonnes */
-      width: 100%;
-      margin: 0 0 1rem;
-      border-radius: 8px;
+      display: inline-block;
+      margin: 0 0 1.2rem;
+      border-radius: 10px;
       overflow: hidden;
-      box-shadow: 0 5px 15px var(--shadow);
-      background: #111;
-      transition: transform .3s, box-shadow .3s;
+      background: var(--bg-dark);
+      box-shadow: 0 6px 15px var(--shadow);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
       cursor: pointer;
     }
+
     .gallery figure:hover {
-      transform: translateY(-5px) scale(1.02);
-      box-shadow: 0 8px 25px var(--shadow);
+      transform: translateY(-6px) scale(1.015);
+      box-shadow: 0 10px 25px var(--shadow);
     }
+
     .gallery img {
-      display: block;
       width: 100%;
-      height: auto;             /* on garde les proportions */
+      height: auto;
+      display: block;
     }
+
     .gallery figcaption {
       display: none;
-      padding: .4rem;
-      background: rgba(0,0,0,0.6);
-      color: var(--accent);
+      padding: 0.6rem;
+      font-size: 0.85rem;
       text-align: center;
-      font-size: .85rem;
+      background: rgba(0, 0, 0, 0.6);
+      color: var(--accent);
     }
+
     .gallery.show-captions figcaption {
       display: block;
     }
 
-    /* Lightbox simplissime */
     .lightbox {
-      position: fixed; inset:0;
+      position: fixed;
+      inset: 0;
       display: none;
-      align-items: center; justify-content: center;
-      background: rgba(0,0,0,.85);
-      z-index: 50;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(0, 0, 0, 0.88);
+      z-index: 1000;
     }
-    .lightbox.active { display: flex; }
+
+    .lightbox.active {
+      display: flex;
+    }
+
     .lightbox img {
-      max-width: 90%; max-height: 90%;
-      border-radius: 6px;
-      box-shadow: 0 0 30px var(--shadow);
+      max-width: 92%;
+      max-height: 92%;
+      border-radius: 8px;
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
     }
+
     .lightbox .close {
       position: absolute;
-      top: 1rem; right: 1rem;
-      font-size: 2rem; color: var(--text);
-      background: none; border: none;
+      top: 1.2rem;
+      right: 1.2rem;
+      font-size: 2.2rem;
+      background: none;
+      color: var(--text);
+      border: none;
       cursor: pointer;
     }
 
     .status {
       text-align: center;
       color: var(--accent);
-      padding: 2rem;
       font-size: 1.2rem;
+      margin-top: 2rem;
     }
+
     @media (max-width: 600px) {
-      header h1 { font-size: 1.8rem; }
-      .controls { flex-direction: column; }
+      header h1 {
+        font-size: 2rem;
+      }
+
+      .controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
     }
   </style>
 </head>
 <body>
-
   <header>
     <h1>XXXHeatMosaic</h1>
   </header>
@@ -152,7 +192,7 @@
       </select>
     </label>
     <label>
-      <input type="checkbox" id="toggle-captions">
+      <input type="checkbox" id="toggle-captions" />
       Légendes
     </label>
   </div>
@@ -164,72 +204,91 @@
 
   <div id="lightbox" class="lightbox" aria-hidden="true">
     <button class="close" aria-label="Fermer">×</button>
-    <img src="" alt="">
+    <img src="" alt="" />
   </div>
 
   <script>
-  (function(){
-    const SUPPORTED = /\.(jpe?g|png|webp|gif)$/i;
-    const G = document.getElementById('gallery');
-    const S = document.getElementById('status');
-    const sortEl = document.getElementById('sort');
-    const capEl  = document.getElementById('toggle-captions');
-    const LB     = document.getElementById('lightbox');
-    const lbImg  = LB.querySelector('img');
-    const btnC   = LB.querySelector('.close');
-    let items = [], urls = [];
+    (function () {
+      const SUPPORTED = /\.(jpe?g|png|webp|gif)$/i;
+      const G = document.getElementById('gallery');
+      const S = document.getElementById('status');
+      const sortEl = document.getElementById('sort');
+      const capEl = document.getElementById('toggle-captions');
+      const LB = document.getElementById('lightbox');
+      const lbImg = LB.querySelector('img');
+      const btnC = LB.querySelector('.close');
+      let items = [], urls = [];
 
-    function build(){
-      G.innerHTML = ''; S.style.display='none';
-      items.forEach((it,i)=>{
-        const fig = document.createElement('figure');
-        fig.dataset.idx = i;
-        fig.innerHTML = `
-          <img src="${it.url}" alt="${it.name}">
-          <figcaption>${it.name}</figcaption>
-        `;
-        G.append(fig);
+      function build() {
+        G.innerHTML = '';
+        S.style.display = 'none';
+        items.forEach((it, i) => {
+          const fig = document.createElement('figure');
+          fig.dataset.idx = i;
+          fig.innerHTML = `
+            <img src="${it.url}" alt="${it.name}">
+            <figcaption>${it.name}</figcaption>
+          `;
+          G.append(fig);
+        });
+      }
+
+      function sortItems() {
+        const v = sortEl.value;
+        if (v === 'name') items.sort((a, b) => a.name.localeCompare(b.name));
+        else if (v === 'nameDesc') items.sort((a, b) => b.name.localeCompare(a.name));
+        else if (v === 'random') items.sort(() => Math.random() - 0.5);
+      }
+
+      async function load() {
+        try {
+          const res = await fetch('UTL.html');
+          if (!res.ok) throw new Error(res.status);
+          const lines = (await res.text()).split('\n');
+          urls = lines.map(l => l.trim()).filter(l => SUPPORTED.test(l));
+          if (!urls.length) throw new Error('Aucune URL valide');
+          items = urls.map(u => ({ url: u, name: u.split('/').pop() }));
+          sortItems();
+          build();
+        } catch (e) {
+          S.textContent = 'Erreur : ' + e.message;
+        }
+      }
+
+      G.addEventListener('click', e => {
+        const fig = e.target.closest('figure');
+        if (!fig) return;
+        const it = items[+fig.dataset.idx];
+        lbImg.src = it.url;
+        lbImg.alt = it.name;
+        LB.classList.add('active');
+        LB.setAttribute('aria-hidden', 'false');
       });
-    }
 
-    function sortItems(){
-      const v = sortEl.value;
-      if(v==='name')      items.sort((a,b)=>a.name.localeCompare(b.name));
-      else if(v==='nameDesc') items.sort((a,b)=>b.name.localeCompare(a.name));
-      else if(v==='random')   items.sort(()=>Math.random()-0.5);
-      // default: origine
-    }
+      btnC.onclick = () => {
+        LB.classList.remove('active');
+        LB.setAttribute('aria-hidden', 'true');
+      };
 
-    async function load(){
-      try {
-        const res = await fetch('UTL.html');
-        if(!res.ok) throw new Error(res.status);
-        const lines = (await res.text()).split('\n');
-        urls = lines.map(l=>l.trim()).filter(l=>SUPPORTED.test(l));
-        if(!urls.length) throw new Error('Aucune URL valide');
-        items = urls.map(u=>({url:u,name:u.split('/').pop()}));
-        sortItems(); build();
-      }
-      catch(e){
-        S.textContent = 'Erreur : '+e.message;
-      }
-    }
+      LB.addEventListener('click', e => {
+        if (e.target === LB) btnC.click();
+      });
 
-    G.addEventListener('click', e=>{
-      const fig = e.target.closest('figure');
-      if(!fig) return;
-      const it = items[+fig.dataset.idx];
-      lbImg.src = it.url; lbImg.alt = it.name;
-      LB.setAttribute('aria-hidden','false'); LB.classList.add('active');
-    });
-    btnC.onclick = ()=>{ LB.classList.remove('active'); LB.setAttribute('aria-hidden','true'); };
-    LB.addEventListener('click', e=>{ if(e.target===LB) btnC.click(); });
-    document.addEventListener('keydown', e=>{ if(e.key==='Escape') btnC.click(); });
-    sortEl.addEventListener('change', ()=>{ sortItems(); build(); });
-    capEl .addEventListener('change', ()=>{ G.classList.toggle('show-captions', capEl.checked); });
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') btnC.click();
+      });
 
-    document.addEventListener('DOMContentLoaded', load);
-  })();
+      sortEl.addEventListener('change', () => {
+        sortItems();
+        build();
+      });
+
+      capEl.addEventListener('change', () => {
+        G.classList.toggle('show-captions', capEl.checked);
+      });
+
+      document.addEventListener('DOMContentLoaded', load);
+    })();
   </script>
 </body>
 </html>
